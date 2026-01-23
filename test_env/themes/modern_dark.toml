@@ -1,0 +1,9 @@
+[meta]
+name = "Modern Dark"
+version = "1.0"
+
+# CORRECT: This is a list (Sequence)
+static_reqs = ["waybar_std"]
+
+[slots]
+window_style = { default = "win_sleek" }

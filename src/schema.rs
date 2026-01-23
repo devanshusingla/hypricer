@@ -1,10 +1,13 @@
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
-/// The Registry: Maps logical IDs to physical paths
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Registry {
+    // Tell Serde: "When you see [static] in TOML, put it in this variable"
+    #[serde(rename = "static")] 
     pub static_modules: HashMap<String, ComponentEntry>,
+    
+    #[serde(rename = "tunable")]
     pub tunable_modules: HashMap<String, ComponentEntry>,
 }
 
@@ -14,11 +17,10 @@ pub struct ComponentEntry {
     pub description: Option<String>,
 }
 
-/// The Theme Manifest: Defines which slots are available
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Theme {
     pub meta: ThemeMeta,
-    #[serde(default)] // Optional: Defaults to empty list
+    #[serde(default)] 
     pub static_reqs: Vec<String>, 
     pub slots: HashMap<String, SlotDef>,
 }
@@ -32,14 +34,13 @@ pub struct ThemeMeta {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SlotDef {
-    pub default: String, // The default Registry ID
+    pub default: String, 
     pub description: Option<String>,
 }
 
-/// The User Profile: The actual "save file" for a user's setup
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Profile {
-    pub base_theme: String, // e.g., "modern_dark"
+    pub base_theme: String, 
     #[serde(default)]
-    pub overrides: HashMap<String, String>, // Slot Name -> Registry ID
+    pub overrides: HashMap<String, String>, 
 }
