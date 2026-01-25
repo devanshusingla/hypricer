@@ -1,8 +1,12 @@
+mod registry; // <--- ADD THIS
+
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use std::fs;
 use std::path::Path;
+use registry::Registry; // <--- ADD THIS
 
+// ... (Keep Cli and Commands structs exactly the same) ...
 #[derive(Parser)]
 #[command(name = "hyprricer", version = "2.0", about = "Reactive Theme Compiler for Hyprland")]
 struct Cli {
@@ -12,7 +16,6 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Compiles the active profile into a background daemon
     Build {
         #[arg(short, long)]
         profile: String,
@@ -21,7 +24,6 @@ enum Commands {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
-
     match cli.command {
         Commands::Build { profile } => {
             let root = std::env::current_dir()?;
@@ -36,12 +38,14 @@ fn handle_build(root: &Path, profile_name: &str) -> Result<()> {
     println!("   📂 Root: {:?}", root);
     println!("   ⚙️  Profile: {}", profile_name);
 
-    // 1. Define Paths
+    // --- STEP 1: LOAD REGISTRY (LAYER 2) ---
+    let registry = Registry::load_from_dir(root)?;
+    
+    // --- STEP 2: SCAFFOLDING (LAYER 1) ---
     let generated_dir = root.join("generated/source");
     let live_dir = root.join("live");
     let daemon_src_dir = generated_dir.join("src");
 
-    // 2. Clean & Scaffold Directories
     println!("   🏗️  Scaffolding build environment...");
     if generated_dir.exists() {
         fs::remove_dir_all(&generated_dir)?;
@@ -49,8 +53,7 @@ fn handle_build(root: &Path, profile_name: &str) -> Result<()> {
     fs::create_dir_all(&daemon_src_dir)?;
     fs::create_dir_all(&live_dir)?;
 
-    // 3. Generate Daemon Cargo.toml
-    // This defines the dependencies for the generated binary
+    // Generate Cargo.toml (Same as before)
     let daemon_cargo_toml = r#"
 [package]
 name = "hrm_daemon"
@@ -66,30 +69,21 @@ toml = "0.8"
 shellexpand = "3.0"
 once_cell = "1.18"
 chrono = "0.4"
-# We will add more dependencies here as we add Watchers (e.g. playerctl)
 "#;
+    fs::write(generated_dir.join("Cargo.toml"), daemon_cargo_toml)?;
 
-    fs::write(generated_dir.join("Cargo.toml"), daemon_cargo_toml)
-        .context("Failed to write daemon Cargo.toml")?;
-
-    // 4. Generate a Skeleton main.rs (Placeholder)
-    // We will populate this in Layer 4
+    // Generate main.rs (Same as before)
     let daemon_main = r#"
 #[tokio::main]
 async fn main() {
     println!("Hello from the Generated Daemon! (Layer 1 Complete)");
 }
 "#;
-    
-    fs::write(daemon_src_dir.join("main.rs"), daemon_main)
-        .context("Failed to write daemon main.rs")?;
+    fs::write(daemon_src_dir.join("main.rs"), daemon_main)?;
 
-    println!("   ✅ Scaffolding complete at ./generated/source/");
+    println!("   ✅ Scaffolding complete.");
     
-    // In future layers, we will:
-    // 5. Parse Registry
-    // 6. Inject Logic
-    // 7. Run 'cargo build' in generated_dir
-
+    // In Layer 3, we will use 'registry' to generate code here
+    
     Ok(())
 }
