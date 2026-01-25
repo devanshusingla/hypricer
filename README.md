@@ -17,6 +17,7 @@ It is a **Transpiler** that reads your theme definition and compiles it into a s
 * **Zero Latency:** Logic is compiled to native code. No shell script overhead.
 * **Reactive:** Change window borders when the music genre changes. Dim the bar when the battery is low.
 * **Type-Safe:** If your theme logic is broken, it won't even compile. No more broken configs at runtime.
+* **Dependency Safety:** The build system validates that you have all necessary tools (jq, playerctl, curl) installed *before* compiling. No more runtime crashes due to missing packages.
 
 ---
 

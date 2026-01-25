@@ -92,6 +92,30 @@ cmd = "swww query | grep 'currently displaying' | cut -d ' ' -f 8"
 default = "unknown.png" # <--- REQUIRED
 ```
 
+### 3.3 Dependency Safety (The `check` field)
+
+To prevent the daemon from crashing at runtime, you can define build-time checks for your components. `hyprricer` will run these commands during the build. If any command fails (exit code != 0), the build will abort with a helpful error.
+
+You can provide a single command or a list of commands.
+
+**Supported on:** `[watcher]`, `[provider]`
+
+**Examples:**
+
+```toml
+# Single Check
+[watcher.time]
+provider = "poll_cmd"
+cmd = "date +%S"
+check = "which date"
+
+# Multiple Checks (All must pass)
+[provider.weather]
+cmd = "curl -s 'wttr.in?format=1' | jq -r .text"
+default = "offline"
+check = ["which curl", "which jq"]
+```
+
 ---
 
 ## 4. Best Practices

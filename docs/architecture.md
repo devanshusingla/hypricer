@@ -13,16 +13,17 @@ This architecture separates the "Build Phase" from the "Runtime Phase," ensuring
 ### 1.1 The Compilation Pipeline
 When the user runs `hyprricer build`, the following steps occur:
 1.  **Parsing:** `hyprricer` reads the Registry, Profile, and Theme package.
-2.  **Scaffolding:** It creates a persistent Cargo project in the config folder.
+2.  **Validation:** It executes all `check` commands defined in the Registry. If any tool (e.g., `playerctl`, `jq`) is missing, the build stops immediately.
+3.  **Scaffolding:** It creates a persistent Cargo project in the config folder.
     * **Location:** `~/.config/hypr/hyprricer/generated/source/`
     * *Benefit:* Users can inspect the generated Rust code for debugging.
-3.  **Injection:**
+4.  **Injection:**
     * **Watchers:** Spawns threads for registered inputs (e.g., `playerctl`, `file_watch`).
     * **Logic:** Copies user-defined Rust logic (`logic/*.rs`) into the crate.
     * **Templates:** Converts `template.conf` into Rust format strings.
-4.  **Compilation:** Runs `cargo build --release`.
-5.  **Installation:** Moves the final binary to the `live/` directory.
-6.  **Hot Reload:** Kills the old daemon and starts the new one.
+5.  **Compilation:** Runs `cargo build --release`.
+6.  **Installation:** Moves the final binary to the `live/` directory.
+7.  **Hot Reload:** Kills the old daemon and starts the new one.
 
 ---
 
