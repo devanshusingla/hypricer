@@ -1,0 +1,4 @@
+# This provider gets the active window class (requires jq)
+[provider.active_window]
+cmd = "hyprctl activewindow -j | jq -r .class"
+default = "unknown"

@@ -5,50 +5,45 @@ use crate::registry::Registry;
 use crate::structs::{Profile, Theme};
 
 pub fn generate(root: &Path, registry: &Registry, profile_name: &str) -> Result<()> {
-    // 1. Load Profile & Theme
     let profile_path = root.join("profiles").join(format!("{}.toml", profile_name));
-    let profile_str = fs::read_to_string(&profile_path)
-        .with_context(|| format!("Profile not found: {:?}", profile_path))?;
+    let profile_str = fs::read_to_string(&profile_path).with_context(|| format!("Profile not found: {:?}", profile_path))?;
     let profile: Profile = toml::from_str(&profile_str)?;
 
     let theme_dir = root.join("themes").join(&profile.base_theme);
     let theme_path = theme_dir.join("theme.toml");
-    let theme_str = fs::read_to_string(&theme_path)
-        .with_context(|| format!("Theme not found: {:?}", theme_path))?;
+    let theme_str = fs::read_to_string(&theme_path).with_context(|| format!("Theme not found: {:?}", theme_path))?;
     let theme: Theme = toml::from_str(&theme_str)?;
 
     println!("   🎨 Compiling Theme: '{}' ({})", theme.meta.name, profile.base_theme);
 
-    // 2. Prepare Paths
+    // Prepare Paths
     let gen_src = root.join("generated/source/src");
     let gen_logic = gen_src.join("logic");
     let live_conf = root.join("live/active_session.conf");
 
-    // 3. Inject Logic (Copy themes/x/logic -> generated/src/logic)
+    // Inject Logic
     if gen_logic.exists() { fs::remove_dir_all(&gen_logic)?; }
     fs::create_dir_all(&gen_logic)?;
-    
     let user_logic_dir = theme_dir.join("logic");
-    if !user_logic_dir.exists() {
-        return Err(anyhow!("Theme is missing 'logic' directory: {:?}", user_logic_dir));
+    if user_logic_dir.exists() {
+        copy_dir_recursive(&user_logic_dir, &gen_logic)?;
+        println!("   🧠 Injected Logic from {:?}", user_logic_dir);
+    } else {
+        fs::write(gen_logic.join("mod.rs"), "")?;
     }
-    
-    copy_dir_recursive(&user_logic_dir, &gen_logic)?;
-    println!("   🧠 Injected Logic from {:?}", user_logic_dir);
 
-    // 4. Load Template
+    // Load Template
     let template_path = root.join(&theme.meta.template);
-    let template_content = fs::read_to_string(&template_path)
-        .with_context(|| format!("Template not found: {:?}", template_path))?;
+    let template_content = fs::read_to_string(&template_path).with_context(|| format!("Template not found: {:?}", template_path))?;
 
-    // 5. Generate Watchers
+    // Generators
     let (watcher_code, watcher_inits) = generate_watchers(registry);
+    let provider_logic = generate_providers(registry);
+    let static_inits = generate_statics(root, &theme, registry); // <--- NEW
 
-    // 6. Generate Main Daemon
-    // FIX: Using r####" to avoid conflict with inner r##" strings
     let main_code = format!(
         r####"
-mod logic; // Import the user's logic
+mod logic; 
 
 use tokio::sync::mpsc;
 use std::process::Command;
@@ -62,7 +57,6 @@ pub struct Event {{
     pub value: String,
 }}
 
-// The Context passed to user logic
 pub struct Context {{
     pub data: HashMap<String, String>,
 }}
@@ -74,7 +68,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {{
     let (tx, mut rx) = mpsc::channel(32);
     let mut cache: HashMap<String, String> = HashMap::new();
     let mut last_update = Instant::now();
-    
+
+    // --- STATIC DEFAULTS ---
+    {} 
+
     // --- WATCHERS ---
     {}
 
@@ -82,17 +79,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {{
     println!("   👂 Waiting for events...");
     
     // Initial Render
-    update_config(&cache);
+    refresh_and_render(&mut cache).await;
 
     while let Some(event) = rx.recv().await {{
         println!("   ✨ Event: {{:?}}", event);
         
-        // 1. Update State
         cache.insert(event.key, event.value);
 
-        // 2. Debounce (Simple)
         if last_update.elapsed().as_millis() > 50 {{
-            update_config(&cache);
+            refresh_and_render(&mut cache).await; // Fetch providers on event
             last_update = Instant::now();
         }}
     }}
@@ -100,21 +95,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {{
     Ok(())
 }}
 
+async fn refresh_and_render(cache: &mut HashMap<String, String>) {{
+    let provider_data = fetch_providers().await;
+    cache.extend(provider_data);
+    update_config(cache);
+}}
+
 fn update_config(data: &HashMap<String, String>) {{
-    let ctx = Context {{ data: data.clone() }};
+    let _ctx = Context {{ data: data.clone() }};
     
-    // 1. Run User Logic (For now, we just proceed to template replacement)
-    // In the future, we will call logic::resolve(&ctx) here.
-    
+    // Template Replacement
     let template = r##"{}"##;
     let mut output = template.to_string();
 
-    // Simple replacement: {{ key }} -> value
+    // Replace {{ key }} with value
     for (k, v) in data {{
         output = output.replace(&format!("{{{{ {{}} }}}}", k), v);
     }}
 
-    // Write to Live Config
     let path = "{}";
     if let Err(e) = fs::write(path, output) {{
         eprintln!("❌ Failed to write config: {{}}", e);
@@ -123,19 +121,41 @@ fn update_config(data: &HashMap<String, String>) {{
     }}
 }}
 
+// --- GENERATED PROVIDER LOGIC ---
+{}
+
 // --- GENERATED WATCHER LOGIC ---
 {}
 "####,
         theme.meta.name,
+        static_inits, // <--- Injected Here
         watcher_inits,
         template_content, 
         live_conf.to_string_lossy(),
+        provider_logic,
         watcher_code
     );
 
     fs::write(gen_src.join("main.rs"), main_code)?;
-
     Ok(())
+}
+
+fn generate_statics(root: &Path, theme: &Theme, registry: &Registry) -> String {
+    let mut code = String::new();
+    for (local_key, global_id) in &theme.static_components {
+        if let Some(def) = registry.static_components.get(global_id) {
+            let abs_path = root.join(&def.path).to_string_lossy().to_string();
+            // We format it as a Hyprland source command
+            let value = format!("source = {}", abs_path);
+            code.push_str(&format!(
+                "    cache.insert(\"{}\".to_string(), r#\"{}\"#.to_string());\n", 
+                local_key, value
+            ));
+        } else {
+            println!("   ⚠️  Warning: Static component '{}' not found in registry.", global_id);
+        }
+    }
+    code
 }
 
 fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
@@ -157,13 +177,12 @@ fn generate_watchers(registry: &Registry) -> (String, String) {
 
     for (id, def) in &registry.watchers {
         let func_name = format!("watch_{}", id.replace(".", "_"));
-        match def.provider.as_str() {
-            "poll_cmd" => {
-                let cmd = &def.cmd;
-                let interval = def.interval.unwrap_or(5000);
-                
-                code_defs.push_str(&format!(
-                    r#"
+        if def.provider == "poll_cmd" {
+            let cmd = &def.cmd;
+            let interval = def.interval.unwrap_or(5000);
+            
+            code_defs.push_str(&format!(
+                r#"
 async fn {}(tx: mpsc::Sender<Event>) {{
     let mut interval = tokio::time::interval(Duration::from_millis({}));
     let mut last_val = String::new();
@@ -183,16 +202,50 @@ async fn {}(tx: mpsc::Sender<Event>) {{
     }}
 }}
 "#,
-                    func_name, interval, cmd, id
-                ));
+                func_name, interval, cmd, id
+            ));
 
-                code_inits.push_str(&format!(
-                    "    let tx_clone = tx.clone();\n    tokio::spawn({}(tx_clone));\n", 
-                    func_name
-                ));
-            }
-            _ => {}
+            code_inits.push_str(&format!(
+                "    let tx_clone = tx.clone();\n    tokio::spawn({}(tx_clone));\n", 
+                func_name
+            ));
         }
     }
     (code_defs, code_inits)
+}
+
+fn generate_providers(registry: &Registry) -> String {
+    let mut calls = String::new();
+    for (id, def) in &registry.providers {
+        calls.push_str(&format!(
+            "    results.insert(\"{}\".to_string(), run_provider(r#\"{}\"#, r#\"{}\"#).await);\n",
+            id, def.cmd, def.default
+        ));
+    }
+
+    format!(
+        r#"
+async fn fetch_providers() -> HashMap<String, String> {{
+    let mut results = HashMap::new();
+{}
+    return results;
+}}
+
+async fn run_provider(cmd: &str, default_val: &str) -> String {{
+    let timeout = Duration::from_millis(200);
+    let task = async {{
+        let output = Command::new("sh").arg("-c").arg(cmd).output();
+        match output {{
+            Ok(o) => String::from_utf8_lossy(&o.stdout).trim().to_string(),
+            Err(_) => default_val.to_string(),
+        }}
+    }};
+    match tokio::time::timeout(timeout, task).await {{
+        Ok(val) => val,
+        Err(_) => default_val.to_string(),
+    }}
+}}
+"#,
+        calls
+    )
 }
