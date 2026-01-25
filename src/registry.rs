@@ -1,11 +1,9 @@
 use anyhow::{Context, Result, anyhow};
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer}; // Added Deserializer
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-// --- The Master Registry ---
-// This holds the merged data from all files.
 #[derive(Debug, Default)]
 pub struct Registry {
     pub static_components: HashMap<String, StaticDef>,
@@ -13,17 +11,12 @@ pub struct Registry {
     pub providers: HashMap<String, ProviderDef>,
 }
 
-// --- TOML Schemas ---
-// These match the structure inside your .toml files
-
 #[derive(Debug, Deserialize)]
 pub struct RegistryFragment {
     #[serde(rename = "static", default)]
     pub static_components: HashMap<String, StaticDef>,
-    
     #[serde(rename = "watcher", default)]
     pub watchers: HashMap<String, WatcherDef>,
-    
     #[serde(rename = "provider", default)]
     pub providers: HashMap<String, ProviderDef>,
 }
@@ -36,16 +29,43 @@ pub struct StaticDef {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct WatcherDef {
-    pub provider: String, // e.g., "poll_cmd"
+    pub provider: String,
     pub cmd: String,
     pub interval: Option<u64>,
     pub output: Option<String>,
+    
+    // FIX: Use custom deserializer to handle String OR List
+    #[serde(default, deserialize_with = "string_or_vec")]
+    pub check: Option<Vec<String>>, 
 }
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct ProviderDef {
     pub cmd: String,
-    pub default: String, // Critical: Providers must have a default
+    pub default: String,
+    
+    // FIX: Use custom deserializer here too
+    #[serde(default, deserialize_with = "string_or_vec")]
+    pub check: Option<Vec<String>>,
+}
+
+// --- HELPER FUNCTION: Allows check = "cmd" OR check = ["cmd1", "cmd2"] ---
+fn string_or_vec<'de, D>(deserializer: D) -> Result<Option<Vec<String>>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum StringOrVec {
+        String(String),
+        Vec(Vec<String>),
+    }
+
+    Option::<StringOrVec>::deserialize(deserializer).map(|opt| match opt {
+        Some(StringOrVec::String(s)) => Some(vec![s]),
+        Some(StringOrVec::Vec(v)) => Some(v),
+        None => None,
+    })
 }
 
 impl Registry {
@@ -54,7 +74,6 @@ impl Registry {
         let mut registry = Registry::default();
 
         if !registry_dir.exists() {
-             // It's okay if it doesn't exist yet, just warn
              println!("   ⚠️  Warning: Registry directory not found at {:?}", registry_dir);
              return Ok(registry);
         }
@@ -87,30 +106,24 @@ impl Registry {
         let fragment: RegistryFragment = toml::from_str(&content)
             .with_context(|| format!("Failed to parse TOML: {:?}", path))?;
 
-        // Merge Static
         for (id, def) in fragment.static_components {
             if self.static_components.contains_key(&id) {
                 return Err(anyhow!("Duplicate Static ID found: '{}' in {:?}", id, path));
             }
             self.static_components.insert(id, def);
         }
-
-        // Merge Watchers
         for (id, def) in fragment.watchers {
             if self.watchers.contains_key(&id) {
                 return Err(anyhow!("Duplicate Watcher ID found: '{}' in {:?}", id, path));
             }
             self.watchers.insert(id, def);
         }
-
-        // Merge Providers
         for (id, def) in fragment.providers {
             if self.providers.contains_key(&id) {
                 return Err(anyhow!("Duplicate Provider ID found: '{}' in {:?}", id, path));
             }
             self.providers.insert(id, def);
         }
-
         Ok(())
     }
 }

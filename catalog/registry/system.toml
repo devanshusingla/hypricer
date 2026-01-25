@@ -2,3 +2,4 @@
 provider = "poll_cmd"
 cmd = "date +%S"
 interval = 1000
+check = "which date"

@@ -16,6 +16,10 @@ pub fn generate(root: &Path, registry: &Registry, profile_name: &str) -> Result<
 
     println!("   🎨 Compiling Theme: '{}' ({})", theme.meta.name, profile.base_theme);
 
+    // --- NEW: VALIDATION STEP ---
+    validate_requirements(registry)?;
+    // ----------------------------
+
     // Prepare Paths
     let gen_src = root.join("generated/source/src");
     let gen_logic = gen_src.join("logic");
@@ -39,7 +43,7 @@ pub fn generate(root: &Path, registry: &Registry, profile_name: &str) -> Result<
     // Generators
     let (watcher_code, watcher_inits) = generate_watchers(registry);
     let provider_logic = generate_providers(registry);
-    let static_inits = generate_statics(root, &theme, registry); // <--- NEW
+    let static_inits = generate_statics(root, &theme, registry);
 
     let main_code = format!(
         r####"
@@ -110,7 +114,7 @@ fn update_config(data: &HashMap<String, String>) {{
 
     // Replace {{ key }} with value
     for (k, v) in data {{
-        output = output.replace(&format!("{{{{ {{}} }}}}", k), v);
+        output = output.replace(&format!("{{{{{{{{ {{}} }}}}}}}}", k), v);
     }}
 
     let path = "{}";
@@ -128,7 +132,7 @@ fn update_config(data: &HashMap<String, String>) {{
 {}
 "####,
         theme.meta.name,
-        static_inits, // <--- Injected Here
+        static_inits,
         watcher_inits,
         template_content, 
         live_conf.to_string_lossy(),
@@ -137,6 +141,49 @@ fn update_config(data: &HashMap<String, String>) {{
     );
 
     fs::write(gen_src.join("main.rs"), main_code)?;
+    Ok(())
+}
+
+fn validate_requirements(registry: &Registry) -> Result<()> {
+    println!("   🔍 Validating dependencies...");
+    
+    // 1. Check Providers
+    for (id, def) in &registry.providers {
+        if let Some(checks) = &def.check {
+            // FIX: Iterate over all checks in the list
+            for (i, cmd) in checks.iter().enumerate() {
+                run_check(id, &format!("Provider (check #{})", i+1), cmd)?;
+            }
+        }
+    }
+
+    // 2. Check Watchers
+    for (id, def) in &registry.watchers {
+        if let Some(checks) = &def.check {
+            for (i, cmd) in checks.iter().enumerate() {
+                run_check(id, &format!("Watcher (check #{})", i+1), cmd)?;
+            }
+        }
+    }
+    
+    Ok(())
+}
+
+fn run_check(id: &str, kind: &str, cmd: &str) -> Result<()> {
+    let status = std::process::Command::new("sh")
+        .arg("-c")
+        .arg(cmd)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .with_context(|| format!("Failed to execute check for {} '{}'", kind, id))?;
+
+    if !status.success() {
+        return Err(anyhow::anyhow!(
+            "\n❌ Missing dependency for {} '{}'.\n   Command '{}' failed.\n   Please install the required tool and try again.\n", 
+            kind, id, cmd
+        ));
+    }
     Ok(())
 }
 

@@ -12,8 +12,10 @@ pub struct Profile {
 pub struct Theme {
     pub meta: ThemeMeta,
     pub inputs: Option<Vec<String>>,
-    #[serde(default)]
-    pub static_components: HashMap<String, String>, // "apps" -> "apps_modern"
+    
+    // FIX: Added rename = "static" to match [static] in theme.toml
+    #[serde(default, rename = "static")] 
+    pub static_components: HashMap<String, String>, 
 }
 
 #[derive(Debug, Deserialize)]
