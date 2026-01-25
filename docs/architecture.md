@@ -13,13 +13,16 @@ This architecture separates the "Build Phase" from the "Runtime Phase," ensuring
 ### 1.1 The Compilation Pipeline
 When the user runs `hyprricer build`, the following steps occur:
 1.  **Parsing:** `hyprricer` reads the Registry, Profile, and Theme package.
-2.  **Scaffolding:** It creates a temporary Cargo project (`hyprricer`).
+2.  **Scaffolding:** It creates a persistent Cargo project in the config folder.
+    * **Location:** `~/.config/hypr/hyprricer/generated/source/`
+    * *Benefit:* Users can inspect the generated Rust code for debugging.
 3.  **Injection:**
     * **Watchers:** Spawns threads for registered inputs (e.g., `playerctl`, `file_watch`).
     * **Logic:** Copies user-defined Rust logic (`logic/*.rs`) into the crate.
-    * **Templates:** Converts `template.conf` into Rust format strings.v
+    * **Templates:** Converts `template.conf` into Rust format strings.
 4.  **Compilation:** Runs `cargo build --release`.
-5.  **Deployment:** Replaces the running Daemon process with the new binary.
+5.  **Installation:** Moves the final binary to the `live/` directory.
+6.  **Hot Reload:** Kills the old daemon and starts the new one.
 
 ---
 
@@ -49,16 +52,24 @@ To handle rapid events (e.g., scrolling through a playlist) without freezing the
 4.  **Resolution Phase (Sequential):**
     * **Construct Context:** Merges Watcher Cache + Provider Results.
     * **Resolve Logic:** Calls `logic::resolve(Context)`.
-5.  **Actuation:** Writes Config (If Changed).
+5.  **Actuation:** Writes Config to `live/active_session.conf` (If Changed).
 
 ---
 
 ## 3. Directory Structure
 
-`hyprricer` moves away from monolithic config files to a **Modular Registry** system.
+`hyprricer` uses a clear separation between **Source Configs** (Themes/Registry) and **Runtime Artifacts** (`live/`).
 
 ```text
 ~/.config/hypr/hyprricer/
+├── live/               # Runtime Artifacts (The "Active" System)
+│   ├── active_session.conf # The Final Output (Source this in hyprland.conf)
+│   ├── daemon              # The Compiled Binary (Running process)
+│   └── daemon.log          # Runtime Logs
+│
+├── generated/          # Intermediate Build Artifacts
+│   └── source/         # The Generated Rust Project (Inspectable)
+│
 ├── catalog/
 │   ├── registry/       # The Definition Layer
 │   │   ├── system.toml     # Defines: Battery, CPU, Memory watchers
@@ -66,9 +77,7 @@ To handle rapid events (e.g., scrolling through a playlist) without freezing the
 │   │   └── styles.toml     # Defines: Window Styles, Animations
 │   │
 │   ├── static/         # The File Layer (Raw Configs)
-│   │   └── ...
 │   └── tunable/        # The Parameter Layer
-│       └── ...
 │
 ├── themes/
 │   └── modern_dark/    # The Package Layer
@@ -86,51 +95,37 @@ To handle rapid events (e.g., scrolling through a playlist) without freezing the
 ---
 
 ## 4. Failure Handling Strategies
+
 ### 4.1 "Slow Neighbor" Protection
-
 If a Theme requires multiple pieces of data (e.g., Battery + Network), a slow network response must not block the UI.
-
-    * **Strategy**: All Providers are spawned in `FuturesUnordered` (Parallel).
-
-    * **Constraint**: The Enrichment Phase has a *Global Timeout* (e.g., 200ms).
-
-    * **Outcome**: If Network takes 2s, it is killed at 200ms. The Context is built using the `default` value defined in the Registry.
+* **Strategy:** All Providers are spawned in `FuturesUnordered` (Parallel).
+* **Constraint:** The Enrichment Phase has a **Global Timeout** (e.g., 200ms).
+* **Outcome:** If Network takes 2s, it is killed at 200ms. The Context is built using the `default` value defined in the Registry.
 
 ### 4.2 Zombie Process Cleanup
-
 Since Watchers are threads inside the Daemon process:
-
-    * **Switching Themes**: `hyprricer` sends `SIGTERM` to the old Daemon.
-
-    * **Result**: The OS immediately closes all threads, file handles (inotify), and socket connections (dbus). No cleanup code is required.
+* **Switching Themes:** `hyprricer` sends `SIGTERM` to the old Daemon.
+* **Result:** The OS immediately closes all threads, file handles (inotify), and socket connections (dbus). No cleanup code is required.
 
 ---
 
 ## 5. Development Workflow
+
 ### 5.1 For Registry Maintainers
-
-    * Define capabilities in `catalog/registry/*.toml`.
-
-    * Provide safe defaults for all Providers.
+* Define **capabilities** in `catalog/registry/*.toml`.
+* Provide safe defaults for all Providers.
 
 ### 5.2 For Theme Developers
-
-    * **Input:** Declare required inputs in `theme.toml` (`inputs = ["music", "battery"]`).
-
-    * **Processing:** Write standard Rust functions in `logic/`.
-
-    * **Output:** Return Component IDs that match keys in the Registry.
+* **Input:** Declare required inputs in `theme.toml` (`inputs = ["music", "battery"]`).
+* **Processing:** Write standard Rust functions in `logic/`.
+* **Output:** Return Component IDs that match keys in the Registry.
 
 ---
 
 ## 6. Future Extensibility
-
 The Registry supports a `provider` field for Watchers. This allows us to easily add new backends in the future without changing the core architecture:
-
-    * `provider = "poll_cmd"` (Planned)
-
-    * `provider = "fs_watch"` (Planned)
-
-    * `provider = "dbus_signal"` (Planned)
-
-    * `provider = "socket_listen"` (Planned)
+* `provider = "poll_cmd"` (Implemented)
+* `provider = "fs_watch"` (Planned)
+* `provider = "dbus_signal"` (Planned)
+* `provider = "socket_listen"` (Planned)
+```
