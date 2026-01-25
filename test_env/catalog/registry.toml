@@ -1,8 +1,0 @@
-[static.waybar_std]
-path = "catalog/static/waybar_dummy.conf"
-
-[tunable.win_sleek]
-path = "catalog/tunable/window_styles/sleek.conf"
-
-[tunable.win_neon]
-path = "catalog/tunable/window_styles/neon.conf"

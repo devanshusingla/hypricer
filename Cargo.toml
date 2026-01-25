@@ -10,3 +10,4 @@ toml = "0.8"
 clap = { version = "4.4", features = ["derive"] }
 shellexpand = "3.0" # To handle "~/.config" paths
 anyhow = "1.0"      # Easy error handling
+regex = "1.10"

@@ -1,4 +1,0 @@
-base_theme = "modern_dark"
-
-[overrides]
-window_style = "win_neon"

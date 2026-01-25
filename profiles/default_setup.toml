@@ -1,0 +1,5 @@
+# profiles/test_setup.toml
+base_theme = "modern_dark"
+
+[overrides]
+# No overrides for now

@@ -3,11 +3,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Registry {
-    // Tell Serde: "When you see [static] in TOML, put it in this variable"
-    #[serde(rename = "static")] 
+    #[serde(rename = "static", default)] 
     pub static_modules: HashMap<String, ComponentEntry>,
     
-    #[serde(rename = "tunable")]
+    #[serde(rename = "tunable", default)]
     pub tunable_modules: HashMap<String, ComponentEntry>,
 }
 
@@ -20,8 +19,15 @@ pub struct ComponentEntry {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Theme {
     pub meta: ThemeMeta,
-    #[serde(default)] 
-    pub static_reqs: Vec<String>, 
+    
+    // 2. The Skeleton File (e.g., "themes/modern.conf")
+    pub template: String, 
+    
+    // 3. The Mapper: "template_key" -> "registry_id"
+    #[serde(default, rename = "static")] 
+    pub static_map: HashMap<String, String>, 
+    
+    // 4. The Dynamic Slots
     pub slots: HashMap<String, SlotDef>,
 }
 
