@@ -1,13 +1,7 @@
-# themes/modern_dark/theme.toml
-template = "themes/modern_dark/template.conf"
-
 [meta]
 name = "Modern Dark"
 version = "1.0"
+template = "themes/modern_dark/template.conf"  # <--- Moved inside [meta]
 
 [static]
-# Map local tag 'apps' to global ID 'apps_modern'
 apps = "apps_modern"
-
-[slots]
-# Empty for now

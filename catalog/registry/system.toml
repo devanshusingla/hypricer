@@ -1,0 +1,4 @@
+[watcher.time_seconds]
+provider = "poll_cmd"
+cmd = "date +%S"
+interval = 1000
