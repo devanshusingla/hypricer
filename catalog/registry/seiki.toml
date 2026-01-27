@@ -1,0 +1,16 @@
+# SEIKI STATIC COMPONENTS REGISTRY
+
+[static.seiki_vars]
+path = "themes/seiki/components/variables.conf"
+
+[static.seiki_startup]
+path = "themes/seiki/components/startup.conf"
+
+[static.seiki_dwindle]
+path = "themes/seiki/components/dwindle.conf"
+
+[static.seiki_decoration]
+path = "themes/seiki/components/decoration.conf"
+
+[static.seiki_keybinds]
+path = "themes/seiki/components/keybinds.conf"

@@ -1,0 +1,28 @@
+[meta]
+name = "Seiki (The Sanctuary)"
+version = "0.1"
+author = "Devanshu"
+template = "themes/seiki/template.conf"
+
+# 1. INPUTS (The Sensors)
+# We will define these registry items in the next step
+inputs = [
+    "time_part",      # For Dawn/Day/Night cycles
+    "active_window",  # For Focus Mode (coding vs anime)
+    "cpu_usage"       # For Mecha Mode (load monitoring)
+]
+
+# 2. STATIC (Standard Config)
+[static]
+variables = "seiki_vars"
+startup = "seiki_startup"
+dwindle = "seiki_dwindle"
+decoration = "seiki_decoration"
+keybinds = "seiki_keybinds"
+
+# 3. DYNAMIC (The Logic)
+# These map {{ tags }} in your config to Rust functions
+[dynamic]
+window_style = "themes/seiki/logic/style.rs"
+bar_style = "themes/seiki/logic/bar.rs"
+

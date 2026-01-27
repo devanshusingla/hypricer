@@ -1,0 +1,13 @@
+# Watcher: time_part
+# Returns: "Dawn", "Day", "Sunset", "Night"
+[watcher.time_part]
+provider = "poll_cmd"
+interval = 60000 # Check every minute
+cmd = """
+hour=$(date +%H);
+if [ "$hour" -ge 6 ] && [ "$hour" -lt 9 ]; then echo "Dawn";
+elif [ "$hour" -ge 9 ] && [ "$hour" -lt 17 ]; then echo "Day";
+elif [ "$hour" -ge 17 ] && [ "$hour" -lt 20 ]; then echo "Sunset";
+else echo "Night"; fi
+"""
+check = "which date"

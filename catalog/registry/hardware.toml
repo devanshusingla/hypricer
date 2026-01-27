@@ -1,0 +1,8 @@
+# Watcher: cpu_usage
+# Returns: Integer 0-100
+[watcher.cpu_usage]
+provider = "poll_cmd"
+interval = 2000 # Check every 2 seconds
+# Uses 'top' in batch mode to get a clean CPU percentage
+cmd = "top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100 - $1}' | cut -d. -f1"
+check = "which top"

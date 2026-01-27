@@ -1,0 +1,5 @@
+# File: profiles/seiki.toml
+base_theme = "seiki"
+
+[overrides]
+# Leave empty for now
