@@ -1,6 +1,7 @@
+use crate::Context;
+
 use std::collections::HashMap;
 
-pub fn apply(inputs: HashMap<String, String>) -> String {
-    // Basic test: Return a comment
-    return "# Bar Logic Placeholder".to_string();
+pub fn resolve(ctx: &Context) -> String {
+    "# Bar Logic Placeholder".to_string()
 }

@@ -1,4 +1,5 @@
 use anyhow::{Context, Result, anyhow};
+use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use crate::registry::Registry;
@@ -28,13 +29,15 @@ pub fn generate(root: &Path, registry: &Registry, profile_name: &str) -> Result<
     // Inject Logic
     if gen_logic.exists() { fs::remove_dir_all(&gen_logic)?; }
     fs::create_dir_all(&gen_logic)?;
-    let user_logic_dir = theme_dir.join("logic");
-    if user_logic_dir.exists() {
-        copy_dir_recursive(&user_logic_dir, &gen_logic)?;
-        println!("   🧠 Injected Logic from {:?}", user_logic_dir);
+
+    let module_map = if !theme.dynamic.is_empty() {
+        let map = inject_logic_modules(root, &theme, &gen_logic)?;
+        generate_logic_mod(&gen_logic, &map)?;
+        map
     } else {
         fs::write(gen_logic.join("mod.rs"), "")?;
-    }
+        HashMap::new()
+    };
 
     // Load Template
     let template_path = root.join(&theme.meta.template);
@@ -44,6 +47,7 @@ pub fn generate(root: &Path, registry: &Registry, profile_name: &str) -> Result<
     let (watcher_code, watcher_inits) = generate_watchers(registry);
     let provider_logic = generate_providers(registry);
     let static_inits = generate_statics(root, &theme, registry);
+    let logic_calls = generate_logic_calls(&module_map);
 
     let main_code = format!(
         r####"
@@ -106,14 +110,22 @@ async fn refresh_and_render(cache: &mut HashMap<String, String>) {{
 }}
 
 fn update_config(data: &HashMap<String, String>) {{
-    let _ctx = Context {{ data: data.clone() }};
+    let ctx = Context {{{{ data: data.clone() }}}};
+    
+    // ✨ NEW: Call dynamic logic functions
+    let mut dynamic_results = HashMap::new();
+    {}  // ← This will be filled with logic calls
+    
+    // Merge data + dynamic results
+    let mut all_data = data.clone();
+    all_data.extend(dynamic_results);
     
     // Template Replacement
-    let template = r##"{}"##;
+    let template = r##"{}\"##;
     let mut output = template.to_string();
 
-    // Replace {{ key }} with value
-    for (k, v) in data {{
+    // Replace {{{{ key }}}} with value
+    for (k, v) in &all_data {{
         output = output.replace(&format!("{{{{{{{{ {{}} }}}}}}}}", k), v);
     }}
 
@@ -134,6 +146,7 @@ fn update_config(data: &HashMap<String, String>) {{
         theme.meta.name,
         static_inits,
         watcher_inits,
+        logic_calls,
         template_content, 
         live_conf.to_string_lossy(),
         provider_logic,
@@ -205,6 +218,19 @@ fn generate_statics(root: &Path, theme: &Theme, registry: &Registry) -> String {
     code
 }
 
+fn generate_logic_calls(module_map: &HashMap<String, String>) -> String {
+    let mut calls = String::new();
+    
+    for (tag, module) in module_map {
+        calls.push_str(&format!(
+            "    dynamic_results.insert(\"{}\".to_string(), logic::{}::resolve(&ctx));\n",
+            tag, module
+        ));
+    }
+    
+    calls
+}
+
 fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
     for entry in fs::read_dir(src)? {
         let entry = entry?;
@@ -215,6 +241,52 @@ fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
             fs::copy(entry.path(), dst.join(entry.file_name()))?;
         }
     }
+    Ok(())
+}
+
+/// Injects user logic into the generated crate
+fn inject_logic_modules(
+    root: &Path, 
+    theme: &Theme, 
+    gen_logic: &Path
+) -> Result<HashMap<String, String>> {
+    let mut module_map = HashMap::new();  // tag → module_name
+    
+    for (tag, rel_path) in &theme.dynamic {
+        let src_file = root.join(rel_path);
+        
+        if !src_file.exists() {
+            return Err(anyhow!("Dynamic logic file not found: {:?}", src_file));
+        }
+        
+        // Extract the module name from the filename
+        // "themes/seiki/logic/style.rs" → "style"
+        let module_name = src_file
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .ok_or_else(|| anyhow!("Invalid filename: {:?}", src_file))?;
+        
+        // Copy the file
+        let dst_file = gen_logic.join(format!("{}.rs", module_name));
+        std::fs::copy(&src_file, &dst_file)
+            .with_context(|| format!("Failed to copy {:?}", src_file))?;
+        
+        module_map.insert(tag.clone(), module_name.to_string());
+        println!("   🧠 Injected: {} → logic::{}", tag, module_name);
+    }
+    
+    Ok(module_map)
+}
+
+/// Generates the logic/mod.rs file that re-exports all modules
+fn generate_logic_mod(gen_logic: &Path, modules: &HashMap<String, String>) -> Result<()> {
+    let mut mod_content = String::from("// Auto-generated module exports\n\n");
+    
+    for module_name in modules.values() {
+        mod_content.push_str(&format!("pub mod {};\n", module_name));
+    }
+    
+    std::fs::write(gen_logic.join("mod.rs"), mod_content)?;
     Ok(())
 }
 

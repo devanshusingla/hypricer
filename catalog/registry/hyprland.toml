@@ -1,6 +1,6 @@
 # Watcher: active_window
 # Returns: The class name of the focused window (e.g., "firefox", "kitty")
-[watcher.active_window]
+[watcher.active_window_changes]
 provider = "poll_cmd"
 interval = 300 # Check every 300ms (fast enough for UI, zero load on your i5)
 cmd = "hyprctl activewindow -j | jq -r .class"

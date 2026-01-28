@@ -1,4 +1,4 @@
-[provider.active_window]
+[provider.current_window]
 cmd = "hyprctl activewindow -j | jq -r .class"
 default = "unknown"
 # Check BOTH tools
