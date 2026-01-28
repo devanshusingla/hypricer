@@ -125,7 +125,7 @@ fn update_config(data: &HashMap<String, String>) {{
 
     // Replace {{{{ key }}}} with value
     for (k, v) in &all_data {{
-        output = output.replace(&format!("{{{{{{{{{{ }}}}}}}}}}", k), v);
+        output = output.replace(&format!("{{{{{{{{ {{}} }}}}}}}}", k), v);
     }}
     
     let path = "{}";
