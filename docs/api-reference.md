@@ -1,6 +1,6 @@
 # API Reference
 
-**Complete reference for all hyprricer interfaces**
+**Complete reference for all hypricer interfaces**
 
 ---
 
@@ -16,13 +16,13 @@
 
 ## CLI Commands
 
-### `hyprricer build`
+### `hypricer build`
 
 Compile and apply a theme.
 
 **Usage:**
 ```bash
-hyprricer build --profile <PROFILE_NAME>
+hypricer build --profile <PROFILE_NAME>
 ```
 
 **Arguments:**
@@ -30,7 +30,7 @@ hyprricer build --profile <PROFILE_NAME>
 
 **Example:**
 ```bash
-hyprricer build --profile seiki
+hypricer build --profile seiki
 ```
 
 **Process:**
@@ -53,22 +53,22 @@ hyprricer build --profile seiki
 
 ```bash
 # List available themes
-hyprricer list themes
+hypricer list themes
 
 # List available profiles  
-hyprricer list profiles
+hypricer list profiles
 
 # Show daemon status
-hyprricer status
+hypricer status
 
 # View logs
-hyprricer logs [-f|--follow]
+hypricer logs [-f|--follow]
 
 # Create new theme from template
-hyprricer new theme <NAME>
+hypricer new theme <NAME>
 
 # Validate without building
-hyprricer check --profile <NAME>
+hypricer check --profile <NAME>
 ```
 
 ---
@@ -651,7 +651,7 @@ for (key, value) in &ctx.data {
 
 ## Version Compatibility
 
-| hyprricer Version | Rust Version | Hyprland Version |
+| hypricer Version | Rust Version | Hyprland Version |
 |-------------------|--------------|------------------|
 | 2.0.x             | 1.70+        | 0.35+            |
 | 2.1.x (planned)   | 1.75+        | 0.36+            |
@@ -662,7 +662,7 @@ for (key, value) in &ctx.data {
 
 ## See Also
 
-- [User Guide](user-guide.md) - Using hyprricer
+- [User Guide](user-guide.md) - Using hypricer
 - [Theme Developer Guide](theme-developer-guide.md) - Creating themes
 - [Registry Manual](registry-manual.md) - Extending the registry
 - [Architecture](architecture.md) - How it all works

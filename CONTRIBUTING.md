@@ -1,6 +1,6 @@
-# Contributing to hyprricer
+# Contributing to hypricer
 
-First off, thank you for considering contributing to hyprricer! It's people like you that make hyprricer a great tool for the community.
+First off, thank you for considering contributing to hypricer! It's people like you that make hypricer a great tool for the community.
 
 ---
 
@@ -49,7 +49,7 @@ This project adheres to a Code of Conduct that we expect all contributors to fol
 - 🔧 **Registry items** - New watchers, providers, or components?
 - 💻 **Core code** - Improvements to the engine itself?
 
-**Not sure where to start?** Check out issues labeled [`good first issue`](https://github.com/yourusername/hyprricer/labels/good%20first%20issue) or [`help wanted`](https://github.com/yourusername/hyprricer/labels/help%20wanted).
+**Not sure where to start?** Check out issues labeled [`good first issue`](https://github.com/yourusername/hypricer/labels/good%20first%20issue) or [`help wanted`](https://github.com/yourusername/hypricer/labels/help%20wanted).
 
 ---
 
@@ -58,7 +58,7 @@ This project adheres to a Code of Conduct that we expect all contributors to fol
 ### Reporting Bugs
 
 **Before submitting:**
-1. Check if it's already reported in [Issues](https://github.com/yourusername/hyprricer/issues)
+1. Check if it's already reported in [Issues](https://github.com/yourusername/hypricer/issues)
 2. Test with the latest version
 3. Try with a minimal theme (like `modern_dark`)
 
@@ -67,7 +67,7 @@ This project adheres to a Code of Conduct that we expect all contributors to fol
 **System Information:**
 - OS: Arch Linux (kernel 6.7.1)
 - Hyprland version: 0.35.0
-- hyprricer version: commit abc1234
+- hypricer version: commit abc1234
 - Rust version: 1.75.0
 
 **Describe the Bug:**
@@ -76,7 +76,7 @@ A clear description of what's broken.
 **To Reproduce:**
 Steps to reproduce:
 1. Clone repo
-2. Run `hyprricer build --profile seiki`
+2. Run `hypricer build --profile seiki`
 3. See error
 
 **Expected Behavior:**
@@ -96,8 +96,8 @@ Any other info (screenshots, config files, etc.)
 ### Suggesting Features
 
 **Before suggesting:**
-1. Check [existing feature requests](https://github.com/yourusername/hyprricer/labels/enhancement)
-2. Consider if it fits hyprricer's scope (Hyprland theming)
+1. Check [existing feature requests](https://github.com/yourusername/hypricer/labels/enhancement)
+2. Consider if it fits hypricer's scope (Hyprland theming)
 
 **Feature Request Template:**
 ```markdown
@@ -127,7 +127,7 @@ Themes are always welcome!
 4. Submit PR
 
 **Theme Checklist:**
-- [ ] Works with fresh hyprricer installation
+- [ ] Works with fresh hypricer installation
 - [ ] All dependencies documented
 - [ ] Includes README with screenshots
 - [ ] Follows naming conventions (`theme_name`, not `theme-name`)
@@ -198,8 +198,8 @@ cargo install cargo-watch    # Auto-recompile on changes
 cargo install cargo-clippy  # Linter
 
 # Clone your fork
-git clone https://github.com/yourfork/hyprricer
-cd hyprricer
+git clone https://github.com/yourfork/hypricer
+cd hypricer
 ```
 
 ### Building from Source
@@ -255,7 +255,7 @@ cargo watch -x 'build --release'
 ### Project Structure
 
 ```
-hyprricer/
+hypricer/
 ├── src/
 │   ├── main.rs          # CLI entry point
 │   ├── registry.rs      # Registry loader
@@ -422,17 +422,17 @@ provider = "poll_cmd"
 
 ```markdown
 <!-- ✅ Good: Clear, with example -->
-## Installing hyprricer
+## Installing hypricer
 
 Clone and build:
 ```bash
-git clone https://github.com/you/hyprricer
-cd hyprricer
+git clone https://github.com/you/hypricer
+cd hypricer
 cargo build --release
 ```
 
 <!-- ❌ Bad: Vague -->
-## Installing hyprricer
+## Installing hypricer
 You need to get the code and compile it.
 ```
 
@@ -487,14 +487,14 @@ update
 - **GitHub Issues** - Bug reports, feature requests
 - **GitHub Discussions** - General questions, ideas
 - **Discord** - Real-time chat (coming soon)
-- **Reddit** - r/hyprricer (coming soon)
+- **Reddit** - r/hypricer (coming soon)
 
 ### Getting Help
 
 **Stuck on something?**
 - Check [docs/](docs/) first
-- Search [closed issues](https://github.com/yourusername/hyprricer/issues?q=is%3Aissue+is%3Aclosed)
-- Ask in [Discussions](https://github.com/yourusername/hyprricer/discussions)
+- Search [closed issues](https://github.com/yourusername/hypricer/issues?q=is%3Aissue+is%3Aclosed)
+- Ask in [Discussions](https://github.com/yourusername/hypricer/discussions)
 
 **Want to help others?**
 - Answer questions in Discussions
@@ -520,6 +520,6 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ## Questions?
 
-Feel free to ask in [Discussions](https://github.com/yourusername/hyprricer/discussions) or reach out to maintainers.
+Feel free to ask in [Discussions](https://github.com/yourusername/hypricer/discussions) or reach out to maintainers.
 
 **Thank you for contributing! 🎉**

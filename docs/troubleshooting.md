@@ -8,10 +8,10 @@
 
 ```bash
 # Run this diagnostic script
-cd ~/.config/hypr/hyprricer
+cd ~/.config/hypr/hypricer
 
 # 1. Check if CLI is built
-./target/release/hyprricer --version 2>/dev/null || echo "❌ CLI not built"
+./target/release/hypricer --version 2>/dev/null || echo "❌ CLI not built"
 
 # 2. Check if daemon is running
 pgrep -f hrm_daemon && echo "✅ Daemon running" || echo "❌ Daemon not running"
@@ -47,7 +47,7 @@ sudo apt install procps   # Ubuntu/Debian
 which top
 ```
 
-**Why this happens:** hyprricer validates dependencies at build-time. Each watcher/provider can specify `check` commands.
+**Why this happens:** hypricer validates dependencies at build-time. Each watcher/provider can specify `check` commands.
 
 ---
 
@@ -122,7 +122,7 @@ ps aux | grep hrm_daemon
 **Diagnosis:**
 ```bash
 # Try running daemon manually
-cd ~/.config/hypr/hyprricer
+cd ~/.config/hypr/hypricer
 ./live/daemon
 
 # Check for errors
@@ -133,7 +133,7 @@ cd ~/.config/hypr/hyprricer
 1. **Daemon was never compiled**
    ```bash
    # Solution: Rebuild
-   hyprricer build --profile seiki
+   hypricer build --profile seiki
    cd generated/source
    cargo build --release
    cp target/release/hrm_daemon ../../live/daemon
@@ -169,10 +169,10 @@ watch -n 1 stat live/active_session.conf
 1. **Hyprland not sourcing the file**
    ```bash
    # Check your hyprland.conf
-   grep "hyprricer" ~/.config/hypr/hyprland.conf
+   grep "hypricer" ~/.config/hypr/hyprland.conf
    
    # Should show:
-   # source = ~/.config/hypr/hyprricer/live/active_session.conf
+   # source = ~/.config/hypr/hypricer/live/active_session.conf
    ```
 
 2. **Daemon not receiving events**
@@ -345,7 +345,7 @@ watch -n 5 'ps aux | grep hrm_daemon | grep -v grep'
 1. Restart daemon periodically (shouldn't be necessary, but):
    ```bash
    pkill hrm_daemon
-   ~/.config/hypr/hyprricer/live/daemon &
+   ~/.config/hypr/hypricer/live/daemon &
    ```
 
 2. Report as a bug with:
@@ -432,7 +432,7 @@ println!("DEBUG: cache = {:?}", cache);
 
 **In CLI:**
 ```bash
-RUST_LOG=debug hyprricer build --profile seiki
+RUST_LOG=debug hypricer build --profile seiki
 ```
 
 ### Manual Daemon Control
@@ -442,7 +442,7 @@ RUST_LOG=debug hyprricer build --profile seiki
 pkill hrm_daemon
 
 # Start daemon in foreground (see output directly)
-cd ~/.config/hypr/hyprricer
+cd ~/.config/hypr/hypricer
 ./live/daemon
 
 # Start in background
@@ -465,27 +465,27 @@ pgrep -a hrm_daemon
    hyprctl version
    rustc --version
    
-   # hyprricer state
-   ls -la ~/.config/hypr/hyprricer/live/
-   tail -50 ~/.config/hypr/hyprricer/live/daemon.log
+   # hypricer state
+   ls -la ~/.config/hypr/hypricer/live/
+   tail -50 ~/.config/hypr/hypricer/live/daemon.log
    
    # Last build output
-   hyprricer build --profile yourprofile 2>&1 | tee build.log
+   hypricer build --profile yourprofile 2>&1 | tee build.log
    ```
 
 2. **Minimal reproduction:**
    - Can you reproduce with `modern_dark` theme?
-   - Does it happen with a fresh `hyprricer` clone?
+   - Does it happen with a fresh `hypricer` clone?
 
 3. **Search existing issues:**
-   - [GitHub Issues](https://github.com/yourusername/hyprricer/issues)
+   - [GitHub Issues](https://github.com/yourusername/hypricer/issues)
 
 ### Reporting a Bug
 
 Include:
 - OS and version
 - Hyprland version
-- hyprricer version (git commit hash)
+- hypricer version (git commit hash)
 - Full error message
 - Relevant logs
 - Steps to reproduce
@@ -495,7 +495,7 @@ Use this template:
 **System:**
 - OS: Arch Linux
 - Hyprland: 0.35.0
-- hyprricer: commit abc1234
+- hypricer: commit abc1234
 
 **Issue:**
 Daemon crashes when CPU usage > 90%
@@ -513,4 +513,4 @@ Daemon crashes when CPU usage > 90%
 
 ---
 
-**Still stuck?** Ask in [Discussions](https://github.com/yourusername/hyprricer/discussions)!
+**Still stuck?** Ask in [Discussions](https://github.com/yourusername/hypricer/discussions)!

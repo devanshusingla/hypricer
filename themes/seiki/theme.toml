@@ -19,6 +19,7 @@ startup = "seiki_startup"
 dwindle = "seiki_dwindle"
 decoration = "seiki_decoration"
 keybinds = "seiki_keybinds"
+style_peace = "seiki_window_peace"
 
 # 3. DYNAMIC (The Logic)
 # These map {{ tags }} in your config to Rust functions

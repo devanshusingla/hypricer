@@ -33,7 +33,7 @@ fn main() -> Result<()> {
 }
 
 fn handle_build(root: &Path, profile_name: &str) -> Result<()> {
-    println!("🍚 hyprricer v2.0");
+    println!("🍚 hypricer v2.0");
     println!("   📂 Root: {:?}", root);
 
     // 1. Load Registry

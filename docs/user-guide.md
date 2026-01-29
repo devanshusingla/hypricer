@@ -1,6 +1,6 @@
 # User Guide
 
-**Complete guide to using hyprricer for end users**
+**Complete guide to using hypricer for end users**
 
 ---
 
@@ -35,12 +35,12 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source $HOME/.cargo/env
 ```
 
-#### 2. Clone hyprricer
+#### 2. Clone hypricer
 
 ```bash
 cd ~/.config/hypr
-git clone https://github.com/yourusername/hyprricer
-cd hyprricer
+git clone https://github.com/yourusername/hypricer
+cd hypricer
 ```
 
 #### 3. Build the CLI
@@ -51,7 +51,7 @@ cargo build --release
 
 **Optional**: Add to PATH
 ```bash
-sudo ln -s ~/.config/hypr/hyprricer/target/release/hyprricer /usr/local/bin/hyprricer
+sudo ln -s ~/.config/hypr/hypricer/target/release/hypricer /usr/local/bin/hypricer
 ```
 
 #### 4. Integrate with Hyprland
@@ -60,23 +60,23 @@ Edit `~/.config/hypr/hyprland.conf`:
 
 ```ini
 # At the very top of the file
-source = ~/.config/hypr/hyprricer/live/active_session.conf
+source = ~/.config/hypr/hypricer/live/active_session.conf
 
 # ... rest of your config
 ```
 
-**Important**: This line MUST be at the top so hyprricer can manage your theme.
+**Important**: This line MUST be at the top so hypricer can manage your theme.
 
 #### 5. Apply Your First Theme
 
 ```bash
-hyprricer build --profile seiki
+hypricer build --profile seiki
 ```
 
 You should see:
 ```
-🍚 hyprricer v2.0
-   📂 Root: "/home/user/.config/hypr/hyprricer"
+🍚 hypricer v2.0
+   📂 Root: "/home/user/.config/hypr/hypricer"
    📚 Loading Registry...
    🎨 Compiling Theme: 'Seiki (The Sanctuary)'
    🔍 Validating dependencies...
@@ -104,7 +104,7 @@ Your theme is now active!
 ps aux | grep hrm_daemon
 
 # View live logs
-tail -f ~/.config/hypr/hyprricer/live/daemon.log
+tail -f ~/.config/hypr/hypricer/live/daemon.log
 
 # Follow logs in real-time
 journalctl --user -f -u hrm_daemon  # if using systemd
@@ -114,7 +114,7 @@ journalctl --user -f -u hrm_daemon  # if using systemd
 
 ```bash
 # Build and apply a different theme
-hyprricer build --profile modern_dark
+hypricer build --profile modern_dark
 
 # Reload Hyprland
 hyprctl reload
@@ -126,21 +126,21 @@ The daemon automatically restarts with the new theme.
 
 ```bash
 # See the currently active config
-cat ~/.config/hypr/hyprricer/live/active_session.conf
+cat ~/.config/hypr/hypricer/live/active_session.conf
 
 # Check when it was last updated
-stat ~/.config/hypr/hyprricer/live/active_session.conf
+stat ~/.config/hypr/hypricer/live/active_session.conf
 ```
 
-### Updating hyprricer
+### Updating hypricer
 
 ```bash
-cd ~/.config/hypr/hyprricer
+cd ~/.config/hypr/hypricer
 git pull
 cargo build --release
 
 # Rebuild your current theme
-hyprricer build --profile seiki
+hypricer build --profile seiki
 ```
 
 ---
@@ -150,7 +150,7 @@ hyprricer build --profile seiki
 ### Listing Available Themes
 
 ```bash
-ls ~/.config/hypr/hyprricer/themes/
+ls ~/.config/hypr/hypricer/themes/
 ```
 
 Each directory is a theme:
@@ -177,10 +177,10 @@ base_theme = "seiki"
 ### Installing Community Themes
 
 ```bash
-cd ~/.config/hypr/hyprricer/themes
+cd ~/.config/hypr/hypricer/themes
 git clone https://github.com/someone/amazing-theme
 cd ../
-hyprricer build --profile amazing-theme
+hypricer build --profile amazing-theme
 ```
 
 ---
@@ -190,7 +190,7 @@ hyprricer build --profile amazing-theme
 ### Directory Structure
 
 ```
-~/.config/hypr/hyprricer/
+~/.config/hypr/hypricer/
 ├── catalog/
 │   ├── registry/          # Component definitions
 │   └── static/            # Shared config files
@@ -223,7 +223,7 @@ hyprricer build --profile amazing-theme
 - `live/active_session.conf` - Active config
 
 **❌ Don't touch:**
-- `src/` - hyprricer CLI source (unless contributing)
+- `src/` - hypricer CLI source (unless contributing)
 
 ### Configuration Files Explained
 
@@ -282,7 +282,7 @@ Edit your theme's `theme.toml` and remove watchers from `inputs = [...]`
 
 **Enable verbose logging**:
 ```bash
-RUST_LOG=debug hyprricer build --profile seiki
+RUST_LOG=debug hypricer build --profile seiki
 ```
 
 **Inspect generated code**:
@@ -301,8 +301,8 @@ cargo build --release
 Add to your `hyprland.conf`:
 ```ini
 # Quick theme switcher
-bind = SUPER_SHIFT, T, exec, hyprricer build --profile seiki && hyprctl reload
-bind = SUPER_SHIFT, M, exec, hyprricer build --profile modern_dark && hyprctl reload
+bind = SUPER_SHIFT, T, exec, hypricer build --profile seiki && hyprctl reload
+bind = SUPER_SHIFT, M, exec, hypricer build --profile modern_dark && hyprctl reload
 ```
 
 ### Auto-start Daemon on Login
@@ -312,12 +312,12 @@ bind = SUPER_SHIFT, M, exec, hyprricer build --profile modern_dark && hyprctl re
 Create `~/.config/systemd/user/hrm_daemon.service`:
 ```ini
 [Unit]
-Description=Hyprricer Theme Daemon
+Description=Hypricer Theme Daemon
 After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=%h/.config/hypr/hyprricer/live/daemon
+ExecStart=%h/.config/hypr/hypricer/live/daemon
 Restart=on-failure
 
 [Install]
@@ -334,28 +334,28 @@ systemctl --user start hrm_daemon
 
 ## FAQ
 
-### Q: Can I use hyprricer with other compositors?
+### Q: Can I use hypricer with other compositors?
 
-**A:** No, hyprricer is specifically designed for Hyprland. However, the concept could be adapted to other compositors.
+**A:** No, hypricer is specifically designed for Hyprland. However, the concept could be adapted to other compositors.
 
 ### Q: Will this break my existing Hyprland config?
 
-**A:** No. The `source = ...` line simply loads hyprricer's config on top of yours. You can still have other settings in `hyprland.conf`.
+**A:** No. The `source = ...` line simply loads hypricer's config on top of yours. You can still have other settings in `hyprland.conf`.
 
 ### Q: How do I uninstall?
 
 ```bash
 # Remove the source line from hyprland.conf
 # Delete the directory
-rm -rf ~/.config/hypr/hyprricer
+rm -rf ~/.config/hypr/hypricer
 ```
 
 ### Q: My theme isn't working!
 
 **Checklist:**
-1. Did you run `hyprricer build`?
+1. Did you run `hypricer build`?
 2. Did you reload Hyprland (`hyprctl reload`)?
-3. Check logs: `tail -f ~/.config/hypr/hyprricer/live/daemon.log`
+3. Check logs: `tail -f ~/.config/hypr/hypricer/live/daemon.log`
 4. Verify dependencies: Re-run build to see validation errors
 
 ### Q: Can I mix components from different themes?
@@ -372,16 +372,16 @@ rm -rf ~/.config/hypr/hyprricer
 
 ### Q: Does this work on Wayland only?
 
-**A:** Yes, Hyprland is Wayland-only, so hyprricer is too.
+**A:** Yes, Hyprland is Wayland-only, so hypricer is too.
 
 ---
 
 ## Getting Help
 
 - **Check logs**: Most issues are visible in `live/daemon.log`
-- **Read error messages**: hyprricer gives detailed errors during build
-- **Ask the community**: [GitHub Discussions](https://github.com/yourusername/hyprricer/discussions)
-- **Report bugs**: [GitHub Issues](https://github.com/yourusername/hyprricer/issues)
+- **Read error messages**: hypricer gives detailed errors during build
+- **Ask the community**: [GitHub Discussions](https://github.com/yourusername/hypricer/discussions)
+- **Report bugs**: [GitHub Issues](https://github.com/yourusername/hypricer/issues)
 
 ---
 

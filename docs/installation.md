@@ -1,6 +1,6 @@
-# hyprricer: Installation & Usage Guide
+# hypricer: Installation & Usage Guide
 
-**hyprricer** is a next-generation theme engine for Hyprland. It compiles themes into native code for maximum performance and instant responsiveness.
+**hypricer** is a next-generation theme engine for Hyprland. It compiles themes into native code for maximum performance and instant responsiveness.
 
 ---
 
@@ -23,21 +23,21 @@ Before installing, ensure you have the following dependencies:
 ## 2. Installation
 
 ### Step 1: Clone the Repository
-Clone `hyprricer` into your Hyprland config directory.
+Clone `hypricer` into your Hyprland config directory.
 
 ```bash
 mkdir -p ~/.config/hypr
-git clone [https://github.com/YourRepo/hyprricer.git](https://github.com/YourRepo/hyprricer.git) ~/.config/hypr/hyprricer
-cd ~/.config/hypr/hyprricer
+git clone [https://github.com/YourRepo/hypricer.git](https://github.com/YourRepo/hypricer.git) ~/.config/hypr/hypricer
+cd ~/.config/hypr/hypricer
 ```
 
 ### Step 2: Build the CLI Tool
-Build the main `hyprricer` management tool.
+Build the main `hypricer` management tool.
 
 ```bash
 cargo build --release
 # Optional: Add to PATH or symlink
-sudo ln -s ~/.config/hypr/hyprricer/target/release/hyprricer /usr/local/bin/hyprricer
+sudo ln -s ~/.config/hypr/hypricer/target/release/hypricer /usr/local/bin/hypricer
 ```
 
 ---
@@ -48,18 +48,18 @@ sudo ln -s ~/.config/hypr/hyprricer/target/release/hyprricer /usr/local/bin/hypr
 Open your main `hyprland.conf` (usually `~/.config/hypr/hyprland.conf`) and add this line at the **top**:
 
 ```ini
-# Load the active hyprricer session
-source = ~/.config/hypr/hyprricer/live/active_session.conf
+# Load the active hypricer session
+source = ~/.config/hypr/hypricer/live/active_session.conf
 ```
 
 *Note: If the file doesn't exist yet, don't worry. The first build will create it.*
 
 ### Step 2: Select a Profile
-`hyprricer` comes with default profiles. List them and pick one.
+`hypricer` comes with default profiles. List them and pick one.
 
 ```bash
 # List available profiles
-hyprricer list profiles
+hypricer list profiles
 
 # Example output:
 # - default
@@ -75,11 +75,11 @@ hyprricer list profiles
 To compile and apply a theme, use the `build` command with a profile.
 
 ```bash
-hyprricer build --profile default
+hypricer build --profile default
 ```
 
 **What happens next?**
-1.  `hyprricer` reads the profile and the associated theme.
+1.  `hypricer` reads the profile and the associated theme.
 2.  It compiles a custom **Daemon** specifically for that theme.
 3.  It starts the Daemon in the background.
 4.  Your Hyprland config updates instantly.
@@ -88,16 +88,16 @@ hyprricer build --profile default
 If something isn't working (e.g., wallpaper isn't changing), check the live logs:
 
 ```bash
-tail -f ~/.config/hypr/hyprricer/live/daemon.log
+tail -f ~/.config/hypr/hypricer/live/daemon.log
 ```
 
 ---
 
 ## 5. Updates
-To update `hyprricer` itself:
+To update `hypricer` itself:
 
 ```bash
-cd ~/.config/hypr/hyprricer
+cd ~/.config/hypr/hypricer
 git pull
 cargo build --release
 ```

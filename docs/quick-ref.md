@@ -1,4 +1,4 @@
-# hyprricer Quick Reference
+# hypricer Quick Reference
 
 **One-page cheat sheet for common tasks**
 
@@ -8,14 +8,14 @@
 
 ```bash
 # Clone
-git clone https://github.com/yourusername/hyprricer ~/.config/hypr/hyprricer
-cd ~/.config/hypr/hyprricer
+git clone https://github.com/yourusername/hypricer ~/.config/hypr/hypricer
+cd ~/.config/hypr/hypricer
 
 # Build
 cargo build --release
 
 # Add to Hyprland config (at the top of hyprland.conf)
-echo "source = ~/.config/hypr/hyprricer/live/active_session.conf" \
+echo "source = ~/.config/hypr/hypricer/live/active_session.conf" \
   >> ~/.config/hypr/hyprland.conf
 ```
 
@@ -25,13 +25,13 @@ echo "source = ~/.config/hypr/hyprricer/live/active_session.conf" \
 
 ```bash
 # Build and apply a theme
-hyprricer build --profile seiki
+hypricer build --profile seiki
 
 # Reload Hyprland (apply changes)
 hyprctl reload
 
 # View daemon logs
-tail -f ~/.config/hypr/hyprricer/live/daemon.log
+tail -f ~/.config/hypr/hypricer/live/daemon.log
 
 # Check if daemon is running
 pgrep -a hrm_daemon
@@ -45,7 +45,7 @@ pkill hrm_daemon
 ## Directory Structure
 
 ```
-~/.config/hypr/hyprricer/
+~/.config/hypr/hypricer/
 ├── catalog/registry/    # Component definitions (watchers, providers)
 ├── themes/              # Theme packages
 ├── profiles/            # Profile selections
@@ -90,7 +90,7 @@ EOF
 
 # 5. Build it
 cd ../../
-hyprricer build --profile mytheme
+hypricer build --profile mytheme
 ```
 
 ---
@@ -216,7 +216,7 @@ cargo check
 | Problem | Solution |
 |---------|----------|
 | Build fails | Check `check` commands are satisfied |
-| Daemon not starting | Rebuild: `hyprricer build --profile X` |
+| Daemon not starting | Rebuild: `hypricer build --profile X` |
 | Config not updating | Reload: `hyprctl reload` |
 | Watcher not firing | Check logs: `tail -f live/daemon.log` |
 
@@ -226,7 +226,7 @@ cargo check
 
 ```bash
 # Enable debug logging
-RUST_LOG=debug hyprricer build --profile seiki
+RUST_LOG=debug hypricer build --profile seiki
 ```
 
 ---
@@ -236,8 +236,8 @@ RUST_LOG=debug hyprricer build --profile seiki
 | File | Purpose |
 |------|---------|
 | `~/.config/hypr/hyprland.conf` | Your Hyprland config (add source line here) |
-| `~/.config/hypr/hyprricer/live/active_session.conf` | Generated config (sourced by Hyprland) |
-| `~/.config/hypr/hyprricer/live/daemon.log` | Runtime logs |
+| `~/.config/hypr/hypricer/live/active_session.conf` | Generated config (sourced by Hyprland) |
+| `~/.config/hypr/hypricer/live/daemon.log` | Runtime logs |
 
 ---
 
@@ -245,8 +245,8 @@ RUST_LOG=debug hyprricer build --profile seiki
 
 ```ini
 # Quick theme switcher
-bind = SUPER_SHIFT, T, exec, hyprricer build --profile seiki && hyprctl reload
-bind = SUPER_SHIFT, M, exec, hyprricer build --profile modern_dark && hyprctl reload
+bind = SUPER_SHIFT, T, exec, hypricer build --profile seiki && hyprctl reload
+bind = SUPER_SHIFT, M, exec, hypricer build --profile modern_dark && hyprctl reload
 
 # Reload without rebuild
 bind = SUPER_SHIFT, R, exec, hyprctl reload
@@ -271,8 +271,8 @@ cmd = "find / -name '*.log' | wc -l"  # Bad: slow
 ## Getting Help
 
 - **Documentation**: `docs/` folder
-- **Issues**: https://github.com/yourusername/hyprricer/issues
-- **Discussions**: https://github.com/yourusername/hyprricer/discussions
+- **Issues**: https://github.com/yourusername/hypricer/issues
+- **Discussions**: https://github.com/yourusername/hypricer/discussions
 
 ---
 

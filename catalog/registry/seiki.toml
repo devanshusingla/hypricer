@@ -14,3 +14,6 @@ path = "themes/seiki/components/decoration.conf"
 
 [static.seiki_keybinds]
 path = "themes/seiki/components/keybinds.conf"
+
+[static.seiki_window_peace]
+path = "themes/seiki/components/tunable/window/peace.conf"

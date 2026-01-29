@@ -1,21 +1,21 @@
 # System Architecture
 
-**Project:** hyprricer
+**Project:** hypricer
 **Version:** 2.0
 **Architecture Type:** Reactive State-Machine Transpiler
 
 ## 1. High-Level Overview
 
-`hyprricer` is not a traditional runtime interpreter. It functions as a **Compiler/Transpiler**. It reads abstract Theme definitions (TOML/Conf) and compiles them into a highly optimized, type-safe **Rust Binary** (The Daemon).
+`hypricer` is not a traditional runtime interpreter. It functions as a **Compiler/Transpiler**. It reads abstract Theme definitions (TOML/Conf) and compiles them into a highly optimized, type-safe **Rust Binary** (The Daemon).
 
 This architecture separates the "Build Phase" from the "Runtime Phase," ensuring zero parsing overhead and maximum stability during actual usage.
 
 ### 1.1 The Compilation Pipeline
-When the user runs `hyprricer build`, the following steps occur:
-1.  **Parsing:** `hyprricer` reads the Registry, Profile, and Theme package.
+When the user runs `hypricer build`, the following steps occur:
+1.  **Parsing:** `hypricer` reads the Registry, Profile, and Theme package.
 2.  **Validation:** It executes all `check` commands defined in the Registry. If any tool (e.g., `playerctl`, `jq`) is missing, the build stops immediately.
 3.  **Scaffolding:** It creates a persistent Cargo project in the config folder.
-    * **Location:** `~/.config/hypr/hyprricer/generated/source/`
+    * **Location:** `~/.config/hypr/hypricer/generated/source/`
     * *Benefit:* Users can inspect the generated Rust code for debugging.
 4.  **Injection:**
     * **Watchers:** Spawns threads for registered inputs (e.g., `playerctl`, `file_watch`).
@@ -59,10 +59,10 @@ To handle rapid events (e.g., scrolling through a playlist) without freezing the
 
 ## 3. Directory Structure
 
-`hyprricer` uses a clear separation between **Source Configs** (Themes/Registry) and **Runtime Artifacts** (`live/`).
+`hypricer` uses a clear separation between **Source Configs** (Themes/Registry) and **Runtime Artifacts** (`live/`).
 
 ```text
-~/.config/hypr/hyprricer/
+~/.config/hypr/hypricer/
 ├── live/               # Runtime Artifacts (The "Active" System)
 │   ├── active_session.conf # The Final Output (Source this in hyprland.conf)
 │   ├── daemon              # The Compiled Binary (Running process)
@@ -105,7 +105,7 @@ If a Theme requires multiple pieces of data (e.g., Battery + Network), a slow ne
 
 ### 4.2 Zombie Process Cleanup
 Since Watchers are threads inside the Daemon process:
-* **Switching Themes:** `hyprricer` sends `SIGTERM` to the old Daemon.
+* **Switching Themes:** `hypricer` sends `SIGTERM` to the old Daemon.
 * **Result:** The OS immediately closes all threads, file handles (inotify), and socket connections (dbus). No cleanup code is required.
 
 ---

@@ -1,4 +1,4 @@
-# hyprricer 🍚
+# hypricer 🍚
 
 <div align="center">
 
@@ -6,7 +6,7 @@
 
 *Compile your rice into a high-performance, event-driven daemon*
 
-[![Version](https://img.shields.io/badge/version-2.0-blue)](https://github.com/yourusername/hyprricer)
+[![Version](https://img.shields.io/badge/version-2.0-blue)](https://github.com/yourusername/hypricer)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-orange)](https://www.rust-lang.org)
 
@@ -16,9 +16,9 @@
 
 ---
 
-## 🎯 What is hyprricer?
+## 🎯 What is hypricer?
 
-**hyprricer** is not just another dotfile manager. It's a **theme transpiler** that compiles declarative theme definitions into optimized Rust binaries that run as system daemons.
+**hypricer** is not just another dotfile manager. It's a **theme transpiler** that compiles declarative theme definitions into optimized Rust binaries that run as system daemons.
 
 ### The Problem It Solves
 
@@ -28,7 +28,7 @@ Traditional Linux theming approaches suffer from:
 - 🔄 **Manual updates** - You have to trigger theme changes yourself
 - 🐛 **No validation** - Broken configs only fail at runtime
 
-### The hyprricer Solution
+### The hypricer Solution
 
 - ⚡ **Zero-latency reactions** - Native code execution, no shell overhead
 - 🛡️ **Build-time validation** - Dependencies checked before compilation
@@ -76,8 +76,8 @@ Traditional Linux theming approaches suffer from:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/hyprricer ~/.config/hypr/hyprricer
-   cd ~/.config/hypr/hyprricer
+   git clone https://github.com/yourusername/hypricer ~/.config/hypr/hypricer
+   cd ~/.config/hypr/hypricer
    ```
 
 2. **Build the CLI tool**
@@ -89,12 +89,12 @@ Traditional Linux theming approaches suffer from:
    
    Edit `~/.config/hypr/hyprland.conf` and add at the **top**:
    ```ini
-   source = ~/.config/hypr/hyprricer/live/active_session.conf
+   source = ~/.config/hypr/hypricer/live/active_session.conf
    ```
 
 4. **Build and apply a theme**
    ```bash
-   ./target/release/hyprricer build --profile seiki
+   ./target/release/hypricer build --profile seiki
    ```
 
 ### Verify Installation
@@ -104,7 +104,7 @@ Traditional Linux theming approaches suffer from:
 ps aux | grep hrm_daemon
 
 # View live logs
-tail -f ~/.config/hypr/hyprricer/live/daemon.log
+tail -f ~/.config/hypr/hypricer/live/daemon.log
 
 # Reload Hyprland to see changes
 hyprctl reload
@@ -116,13 +116,13 @@ hyprctl reload
 
 ### User Guides
 - **[Installation Guide](docs/installation.md)** - Detailed setup instructions
-- **[User Manual](docs/user-guide.md)** - Using hyprricer day-to-day
+- **[User Manual](docs/user-guide.md)** - Using hypricer day-to-day
 - **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
 
 ### Developer Guides
 - **[Theme Developer Guide](docs/theme-developer-guide.md)** - Creating custom themes
 - **[Registry Manual](docs/registry-manual.md)** - Extending the component catalog
-- **[Architecture Overview](docs/architecture.md)** - How hyprricer works internally
+- **[Architecture Overview](docs/architecture.md)** - How hypricer works internally
 - **[API Reference](docs/api-reference.md)** - Complete API documentation
 
 ### Examples
@@ -191,7 +191,7 @@ pub fn resolve(ctx: &Context) -> String {
 │                         Build Time                              │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  1. hyprricer CLI                                               │
+│  1. hypricer CLI                                               │
 │     │                                                           │
 │     ├─ Load Registry (catalog/registry/*.toml)                 │
 │     │   • Watchers (system event listeners)                    │
@@ -251,7 +251,7 @@ pub fn resolve(ctx: &Context) -> String {
 ## 🎭 Featured Themes
 
 ### Seiki (The Sanctuary)
-A showcase of hyprricer's capabilities featuring:
+A showcase of hypricer's capabilities featuring:
 - ✨ Three distinct modes (Peace, Mecha, Focus)
 - 🌅 Day/night cycle with automatic wallpaper switching
 - 🎵 Music-reactive styling
@@ -329,8 +329,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 💬 Community
 
 - **Discord**: [Join our server](https://discord.gg/yourserver) (coming soon)
-- **Reddit**: [r/hyprricer](https://reddit.com/r/hyprricer) (coming soon)
-- **Matrix**: `#hyprricer:matrix.org` (coming soon)
+- **Reddit**: [r/hypricer](https://reddit.com/r/hypricer) (coming soon)
+- **Matrix**: `#hypricer:matrix.org` (coming soon)
 
 ---
 
@@ -340,6 +340,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 *If you find this project useful, consider giving it a ⭐ on GitHub!*
 
-[Report Bug](https://github.com/yourusername/hyprricer/issues) • [Request Feature](https://github.com/yourusername/hyprricer/issues) • [Discussions](https://github.com/yourusername/hyprricer/discussions)
+[Report Bug](https://github.com/yourusername/hypricer/issues) • [Request Feature](https://github.com/yourusername/hypricer/issues) • [Discussions](https://github.com/yourusername/hypricer/discussions)
 
 </div>

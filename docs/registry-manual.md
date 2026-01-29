@@ -1,10 +1,10 @@
-# hyprricer: Registry Manual
+# hypricer: Registry Manual
 
 **Target Audience:** Power Users & Registry Maintainers
 
-The **Registry** (`~/.config/hypr/hyprricer/catalog/registry/`) is the database of building blocks. A Theme Developer cannot use a "CPU Watcher" or a "Neon Window Style" unless it is first defined here.
+The **Registry** (`~/.config/hypr/hypricer/catalog/registry/`) is the database of building blocks. A Theme Developer cannot use a "CPU Watcher" or a "Neon Window Style" unless it is first defined here.
 
-`hyprricer` recursively reads **all `.toml` files** in this directory. You can organize them however you like (e.g., `audio.toml`, `system.toml`, `visuals.toml`).
+`hypricer` recursively reads **all `.toml` files** in this directory. You can organize them however you like (e.g., `audio.toml`, `system.toml`, `visuals.toml`).
 
 ---
 
@@ -39,14 +39,14 @@ description = "Full desktop suite with background apps"
 ```
 
 **Fields:**
-* `path`: Relative path from the `hyprricer` root.
+* `path`: Relative path from the `hypricer` root.
 * `description`: (Optional) Helpful text for UI tools.
 
 ---
 
 ## 3. Defining Inputs (Watchers & Providers)
 
-This is where you define how `hyprricer` talks to the OS.
+This is where you define how `hypricer` talks to the OS.
 
 ### 3.1 Watchers (`[watcher]`)
 Watchers run continuously in the background. They are responsible for saying **"Something changed!"**
@@ -94,7 +94,7 @@ default = "unknown.png" # <--- REQUIRED
 
 ### 3.3 Dependency Safety (The `check` field)
 
-To prevent the daemon from crashing at runtime, you can define build-time checks for your components. `hyprricer` will run these commands during the build. If any command fails (exit code != 0), the build will abort with a helpful error.
+To prevent the daemon from crashing at runtime, you can define build-time checks for your components. `hypricer` will run these commands during the build. If any command fails (exit code != 0), the build will abort with a helpful error.
 
 You can provide a single command or a list of commands.
 
